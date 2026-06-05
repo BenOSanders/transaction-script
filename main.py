@@ -19,7 +19,7 @@ client = plaid_api.PlaidApi(api_client)
 
 def get_transactions():
     try:
-        request = 
+        
     except:
 
 def main():
