@@ -2,11 +2,10 @@ from pydantic import BaseModel
 from typing import Optional
 import datetime
 
+# Plaid Data Models
 class Transaction(BaseModel):
-    id: Optional[int] = None
-    plaid_transaction_id: str
+    transaction_id: str
     account_id: str
-    item_id: str
     amount: float
     description: str
     date: datetime
@@ -25,9 +24,13 @@ class SyncState(BaseModel):
 class Account(BaseModel):
     account_id: str
     item_id: str
+    type: str
 
 class Item(BaseModel):
     item_id: str
     name: str
     balance: str
     access_token: str
+
+
+# API Data Models

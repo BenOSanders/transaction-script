@@ -2,7 +2,9 @@ from app.config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET
 from app.sync_transactions import sync_transactions
 import plaid
 from plaid.api import plaid_api
-import requests
+import FastAPI
+
+app = FastAPI.app()
 
 configuration = plaid.Configuration(
     host=ENVIRONMENT,

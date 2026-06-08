@@ -1,6 +1,11 @@
 import plaid
 from plaid.model.transactions_sync_request import TransactionsSyncRequest
 
+def format_transactions(t: dict):
+    """
+    Takes dict of transactions and formats them into a tuple of Transactions
+    """
+
 def sync_transactions(client):
     request = TransactionsSyncRequest(
         access_token="",
@@ -20,4 +25,5 @@ def sync_transactions(client):
         modified_transactions += response['modified']
         deleted_transactions += response['removed']
 
-    # pass into function to add to DB
+    # pass into function to put into tuple of Transactions pydanic type for passing to upsert_transactions(t: tuple)
+
