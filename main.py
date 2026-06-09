@@ -1,33 +1,25 @@
-from app.config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET
-from app.sync_transactions import sync_transactions
-import plaid
-from plaid.api import plaid_api
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from db import init_db
+from db import queries
+from config import Item
+from sqlite3 import Row
 
+from db import init_db
 
 app = FastAPI()
 
 
-configuration = plaid.Configuration(
-    host=ENVIRONMENT,
-    api_key={
-        'clientId': CLIENT_ID,
-        'secret': PLAID_SECRET
-    }
-)
+@app.post("/transactions/sync")
+def sync_transactions():
+    # Sync plaid transactions
 
-api_client = plaid.ApiClient(configuration)
+@app.get("/transactions/")
+def get_all_transactions():
+    # Get all transactions
 
-# API client where each endpoint returns dict which contains the parsed JSON from the HTTP res
-client = plaid_api.PlaidApi(api_client)
-
-
-def main():
-    sync_transactions(client)
-
-
-if __name__ == "__main__":
-    main()
+@app.get("/transactions/{transaction_id}"):
+def get_transaction(item_id: Item):
+    # Get specific transaction
+    transactions: Row = queries.get_transactions(item_id) # returns sqlite3 row object
+    return transactions

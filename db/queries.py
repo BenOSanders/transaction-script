@@ -4,13 +4,13 @@ from config import DB_PATH
 from sqlite3 import Row
 
 # Transactions
-def get_transactions(t: Transaction) -> Row:
+def get_transactions(i: Item) -> Row:
     """
 
     """
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    return cu.execute("SELECT * FROM transactions;").fetchone()
+    return cu.execute("SELECT * FROM transactions WHERE item_id = ?;", i.item_id).fetchone()
 
 
 ## Upsert transactions

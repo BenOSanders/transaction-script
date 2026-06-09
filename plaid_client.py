@@ -1,5 +1,20 @@
 import plaid
 from plaid.model.transactions_sync_request import TransactionsSyncRequest
+from plaid_client import sync_transactions
+from plaid.api import plaid_api
+from config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET
+
+# Plaid Setup
+configuration = plaid.Configuration(
+    host=ENVIRONMENT,
+    api_key={
+        'clientId': CLIENT_ID,
+        'secret': PLAID_SECRET
+    }
+)
+plaid_api_client = plaid.ApiClient(configuration)
+client = plaid_api.PlaidApi(plaid_api_client) # API client where each endpoint returns dict which contains the parsed JSON from the HTTP res
+
 
 def format_transactions(t: dict):
     """
