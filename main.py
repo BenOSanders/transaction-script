@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from db import queries
 from config import Item
 from sqlite3 import Row
 from routers import transactions, plaid, chat
 from db import init_db
+from config import DB_PATH
 
+init_db(DB_PATH)
 
 # Fast API Setup
 app = FastAPI()

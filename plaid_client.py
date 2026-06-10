@@ -1,6 +1,8 @@
 import plaid
 from plaid.api import plaid_api
-from plaid.model.link_token_create_request import LinkTokenCreateRequest
+from plaid.model.link_token_transactions import LinkTokenTransactions
+from plaid.model.link_token_create_hosted_link import LinkTokenCreateHostedLink
+from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
 from plaid.model.transactions_sync_request import TransactionsSyncRequest
 from config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET
@@ -18,12 +20,19 @@ plaid_api_client = plaid.ApiClient(configuration)
 client = plaid_api.PlaidApi(plaid_api_client) # API client where each endpoint returns dict which contains the parsed JSON from the HTTP res
 
 
-def create_link_token():
-    req = LinkTokenCreateRequest(
+def create_link_token(user_email: str):
+    req = LinkTokenCreateHostedLink(
         products=["transactions"],
         client_name="home-budget",
         country_codes=["US"],
-        language="US"
+        language="en",
+        delivery_method="email",
+         transactions=LinkTokenTransactions(
+            days_requested=730
+        ),
+        user=LinkTokenCreateRequestUser(
+            email_address=user_email
+        )
     )
     res = client.link_token_create(req)
     return res["link_token"]
