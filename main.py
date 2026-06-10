@@ -4,22 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from db import queries
 from config import Item
 from sqlite3 import Row
-
+from routers import transactions, plaid, chat
 from db import init_db
 
+
+# Fast API Setup
 app = FastAPI()
 
+app.include_router(transactions.router, prefix="/api")
+app.include_router(plaid.router, prefix="/api")
 
-@app.post("/transactions/sync")
-def sync_transactions():
-    # Sync plaid transactions
-
-@app.get("/transactions/")
-def get_all_transactions():
-    # Get all transactions
-
-@app.get("/transactions/{transaction_id}"):
-def get_transaction(item_id: Item):
-    # Get specific transaction
-    transactions: Row = queries.get_transactions(item_id) # returns sqlite3 row object
-    return transactions

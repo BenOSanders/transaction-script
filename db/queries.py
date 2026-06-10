@@ -1,17 +1,18 @@
-from app.db.connection import get_connection
-from models import Transaction, Account, SyncState, Item
-from config import DB_PATH
+from db.connection import get_connection
+from config.models import Transaction, Account, SyncState, Item
+from config.config import DB_PATH
 from sqlite3 import Row
 
 # Transactions
 def get_transactions(i: Item) -> Row:
-    """
-
-    """
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
     return cu.execute("SELECT * FROM transactions WHERE item_id = ?;", i.item_id).fetchone()
 
+def get_all_transactions() -> Row:
+    cx = get_connection(DB_PATH)
+    cu = cx.cursor()
+    return cu.execute("SELECT * FROM transactions").fetchmany()
 
 ## Upsert transactions
 def upsert_transactions(t: Transaction) -> None:
@@ -40,13 +41,13 @@ def upsert_transactions(t: Transaction) -> None:
                    {"transaction_id": t.transaction_id, "account_id": t.account_id, "amount": t.amount, "description": t.description, "date": t.date, "merchant_name": t.merchant_name, "address": t.address, "zipcode": t.zipcode, "category": t.category, "plaid_category": t.plaid_category, "pending": t.pending, "notes": t.notes})
 
 ## Delete transactions
-def delete_transaction(t: Transaction) -> bool:
+def delete_transactions(transactions: list[Transaction]) -> bool:
     """
     should only be used interanlly, not exposed via API. Only for deleteing transactions from Plaid's transaction pull. Don't see any reason for users to delete transactions since transactions come directly from Plaid. 
     """
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    cu.execute("DELETE * FROM transactions WHERE transaction_id = ?;", t.transaction_id)
+    cu.executemany("DELETE * FROM transactions WHERE transaction_id = ?;", [(id,) for transaction_id in transactions])
 
 
 # Sync State
