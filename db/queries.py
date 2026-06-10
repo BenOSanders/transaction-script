@@ -1,6 +1,6 @@
 from db.connection import get_connection
-from config.models import Transaction, Account, SyncState, Item
-from config.config import DB_PATH
+from config import Transaction, Account, SyncState, Item
+from config import DB_PATH
 from sqlite3 import Row
 
 # Transactions

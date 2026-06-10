@@ -1,2 +1,2 @@
-from config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET
-from models import Transaction, Item, Account, SyncState
+from .secrets import ENVIRONMENT, CLIENT_ID, PLAID_SECRET, DB_PATH
+from .models import Transaction, Item, Account, SyncState

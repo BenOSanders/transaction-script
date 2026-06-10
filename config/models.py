@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-import datetime
+# import datetime
 
 # Plaid Data Models
 class Transaction(BaseModel):
@@ -8,7 +8,7 @@ class Transaction(BaseModel):
     account_id: str
     amount: float
     description: str
-    date: datetime
+    date: str
     merchant_name: str
     address: str
     zipcode: str

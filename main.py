@@ -14,3 +14,8 @@ app = FastAPI()
 app.include_router(transactions.router, prefix="/api")
 app.include_router(plaid.router, prefix="/api")
 
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+#@app.get('/')
+#def root():
+#    return {"html": ./static/index.html}
