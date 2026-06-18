@@ -1,4 +1,4 @@
-from db import get_transactions
+from db import get_all_transactions
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
@@ -6,5 +6,5 @@ router = APIRouter()
 # Get transactions
 @router.get("/transactions")
 def read_transactions():
-    return {get_transactions()}
+    return get_all_transactions()
 

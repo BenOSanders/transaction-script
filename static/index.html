@@ -2,7 +2,7 @@
 
 <html>
     <head>
-        <title>Finance</title>
+        <title>Home Budget</title>
           <style>
             body { font-family: sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; }
             table { width: 100%; border-collapse: collapse; }
@@ -15,6 +15,8 @@
     </head>
     <body>
         <h2>Transactions</h2>
+        <button onclick="sync()">Sync</button>
+        <button onclick="link()">Link</button>
         <table id="tx-table">
             <thead><tr><th>Amount</th><th>Description</th><th>Date</th><th>Merchant Name</th><th>Category</th><th>Address</th><th>Zipcode</th><th>Pending</th><th>Notes</th></tr></thead>
             <tbody id="tx-body"></tbody>
@@ -37,7 +39,7 @@
             .then(data => {
                 const tableBody = document.getElementById("tx-body");
                 data.transactions.forEach(tx => {
-                    tbody.innerHTML += `
+                    tableBody.innerHTML += `
                     <tr>
                     <td>${tx.amount.toFixed(2)}</td>
                     <td>${tx.description}</td>
@@ -56,8 +58,17 @@
         function sync() {
             fetch("/api/sync", {
                 method: "POST",
-                headers: { "Content Type": "application/json" }
+                headers: { "Content-Type": "application/json" }
             }).then(() => loadTransaction())
         } 
+
+        function link() {
+            fetch("/api/link", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(r => r.json())
+            .then(res => window.location.href = res.hosted_link_url)
+        }
     </script>
 </html>
