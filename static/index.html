@@ -69,6 +69,12 @@
             })
             .then(r => r.json())
             .then(res => window.location.href = res.hosted_link_url)
+            .then(res => {
+                fetch("/api/import-new-items", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                })
+            })
         }
     </script>
 </html>
