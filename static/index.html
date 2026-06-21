@@ -16,7 +16,7 @@
     <body>
         <h2>Transactions</h2>
         <button onclick="sync()">Sync</button>
-        <button onclick="link()">Link</button>
+        <button onclick="link()">Add Bank Account</button>
         <table id="tx-table">
             <thead><tr><th>Amount</th><th>Description</th><th>Date</th><th>Merchant Name</th><th>Category</th><th>Address</th><th>Zipcode</th><th>Pending</th><th>Notes</th></tr></thead>
             <tbody id="tx-body"></tbody>
@@ -30,6 +30,9 @@
         </div>
 
     </body>
+
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+
     <script>
         loadTransaction()
 
@@ -62,19 +65,24 @@
             }).then(() => loadTransaction())
         } 
 
-        function link() {
-            fetch("/api/link", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" }
-            })
-            .then(r => r.json())
-            .then(res => window.location.href = res.hosted_link_url)
-            .then(res => {
-                fetch("/api/import-new-items", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" }
-                })
-            })
+        async function link() {
+            res = await fetch('/api/plaid/create-link-token', { method: 'POST' })
+            const link_token = await res.json()
+
+            const handler = Plaid.create({
+                token: link_token,
+                onSuccess: async (public_token, metadata) => {
+                    await fetch('/api/plaid/exchange', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ public_token })
+                    });
+                    console.log("Link successful")
+                },
+                onExit: (err, metadata) => {
+                    if (err) console.log("Plaid link error:", err)
+                },
+            });
         }
     </script>
 </html>

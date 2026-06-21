@@ -23,6 +23,7 @@ async def link_account():
 
 @router.post("/import-new-items")
 def import_items():
+    # We have an access token
     added_items_list = get_link_token()["results"]["item_add_results"]
     prepared_items = list(Item)
     for item in added_items_list:
@@ -33,3 +34,11 @@ def import_items():
                 name=item['institution']['name']
             )
         )
+
+@router.post("/create-link-token")
+def create_link_token():
+    pass
+
+@router.post("/exchange")
+def exchange():
+    pass
