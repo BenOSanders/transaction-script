@@ -93,7 +93,7 @@ def insert_account(a: Account) -> None:
 def insert_account(i: Item) -> None:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    cu.execute("INSERT INTO items VALUES (?, ?, ?, ?)", (i.item_id, i.name, i.balance, i.access_token))
+    cu.execute("INSERT INTO items VALUES (?, ?)", (i.item_id, i.access_token))
 
 
 ## Get Balance

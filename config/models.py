@@ -24,12 +24,12 @@ class SyncState(BaseModel):
 class Account(BaseModel):
     account_id: str
     item_id: str
+    name: str
+    balance: float
     type: str
 
 class Item(BaseModel):
     item_id: str
-    name: str
-    balance: str
     access_token: str
 
 

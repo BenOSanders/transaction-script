@@ -3,8 +3,12 @@ from fastapi import APIRouter
 from db import get_all_transactions
 from plaid_client import sync_plaid_transactions, create_link_token, get_link_token, exchange_public_token
 from config import Item
+from pydantic import BaseModel
 
 router = APIRouter()
+
+class ExchangeRequest(BaseModel):
+    public_token: str
 
 @router.post("/sync")
 def sync_transactions():
@@ -17,9 +21,9 @@ def sync_transactions():
 #    transactions = get_all_transactions()
 #    return dict(transactions)
 
-@router.get("/link")
-async def link_account():
-    return await create_link_token()
+@router.post("/link")
+def link_account():
+    return create_link_token()
 
 @router.post("/import-new-items")
 def import_items():
@@ -33,12 +37,8 @@ def import_items():
                 item_id=item['item_id'],
                 name=item['institution']['name']
             )
-        )
-
-@router.post("/create-link-token")
-def create_link_token():
-    pass
+        ) 
 
 @router.post("/exchange")
-def exchange():
-    pass
+def exchange(body: ExchangeRequest):
+    exchange_public_token(body.public_token)

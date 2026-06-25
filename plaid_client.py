@@ -7,11 +7,13 @@ from plaid.model.link_token_create_hosted_link import LinkTokenCreateHostedLink
 from plaid.model.link_token_get_response import LinkTokenGetResponse
 from plaid.model.link_token_get_request import LinkTokenGetRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
+from plaid.model.item_public_token_create_response import ItemPublicTokenCreateResponse
 from plaid.model.transactions_sync_request import TransactionsSyncRequest
 from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
 from config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET, ACCESS_TOKEN, USER_ID
-from db import upsert_transactions, delete_transactions
+from db import upsert_transactions, delete_transactions, insert_account
+from config import Item
 
 
 if ENVIRONMENT == "PRODUCTION": 
@@ -42,12 +44,10 @@ def create_link_token():
         ),
         user=LinkTokenCreateRequestUser(
             client_user_id=USER_ID
-        ),
-        hosted_link=LinkTokenCreateHostedLink(
         )
     )
     res = client.link_token_create(req)
-    return {"hosted_link_url": res["hosted_link_url"]}
+    return {"link_token": res.link_token}
 
 # Get public token
 def get_link_token():
@@ -59,7 +59,12 @@ def get_link_token():
 # exchange public token
 def exchange_public_token(public_token: str) -> tuple[str, str]:
     req = ItemPublicTokenExchangeRequest(public_token=public_token)
-    res = client.item_public_token_exchange(req)
+    res : ItemPublicTokenCreateResponse = client.item_public_token_exchange(req)
+    item = Item(
+        item_id=res.item_id,
+        access_token=res.access_token
+    )
+    insert_account(item)
     return res["access_token"], res["item_id"]
 
 

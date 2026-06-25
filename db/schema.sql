@@ -1,13 +1,13 @@
 CREATE TABLE IF NOT EXISTS items (
     item_id TEXT PRIMARY KEY,
-    account_name TEXT NOT NULL,
-    balance REAL NOT NULL,
     access_token TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS accounts (
     account_id TEXT PRIMARY KEY,
     item_id TEXT,
+    account_name TEXT NOT NULL,
+    balance REAL NOT NULL,
     account_type TEXT NOT NULL,
     FOREIGN KEY (item_id) REFERENCES items(item_id)
 );

@@ -16,7 +16,7 @@
     <body>
         <h2>Transactions</h2>
         <button onclick="sync()">Sync</button>
-        <button onclick="link()">Add Bank Account</button>
+        <button id="link-btn">Add Bank Account</button>
         <table id="tx-table">
             <thead><tr><th>Amount</th><th>Description</th><th>Date</th><th>Merchant Name</th><th>Category</th><th>Address</th><th>Zipcode</th><th>Pending</th><th>Notes</th></tr></thead>
             <tbody id="tx-body"></tbody>
@@ -44,13 +44,13 @@
                 data.transactions.forEach(tx => {
                     tableBody.innerHTML += `
                     <tr>
-                    <td>${tx.amount.toFixed(2)}</td>
+                    <td>$${tx.amount.toFixed(2)}</td>
                     <td>${tx.description}</td>
-                    <td>$${tx.date}</td>
-                    <td>$${tx.merchant_name}</td>
+                    <td>${tx.date}</td>
+                    <td>${tx.merchant_name}</td>
                     <td>${tx.category ?? "—"}</td>
-                    <td>$${tx.address}</td>
-                    <td>$${tx.zipcode}</td>
+                    <td>${tx.address}</td>
+                    <td>${tx.zipcode}</td>
                     <td>${tx.pending}</td>
                     <td>${tx.notes}</td>
                     </tr>`;
@@ -63,16 +63,18 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
             }).then(() => loadTransaction())
-        } 
+        }
+
+        let handler = null;
 
         async function link() {
-            res = await fetch('/api/plaid/create-link-token', { method: 'POST' })
-            const link_token = await res.json()
+            res = await fetch('/api/link', { method: 'POST' });
+            const { link_token } = await res.json();
 
-            const handler = Plaid.create({
+            handler = Plaid.create({
                 token: link_token,
                 onSuccess: async (public_token, metadata) => {
-                    await fetch('/api/plaid/exchange', {
+                    await fetch('/api/exchange', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ public_token })
@@ -84,5 +86,15 @@
                 },
             });
         }
+
+        document.getElementById('link-btn').addEventListener('click', () => {
+            if (handler) {
+                handler.open()
+            } else {
+                console.error('Plaid not initialized yet');
+            }
+        });
+
+        link();
     </script>
 </html>
