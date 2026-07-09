@@ -7,12 +7,18 @@ from sqlite3 import Row
 def get_transactions(i: Item) -> Row:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    return cu.execute("SELECT * FROM transactions WHERE item_id = ?;", i.item_id).fetchone()
+    tsx = cu.execute("SELECT * FROM transactions WHERE item_id = ?;", i.item_id).fetchone()
+    cu.close()
+    cx.close()    
+    return tsx
 
 def get_all_transactions() -> Row:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    return cu.execute("SELECT * FROM transactions").fetchmany()
+    tsx = cu.execute("SELECT * FROM transactions").fetchmany()
+    cu.close()
+    cx.close()
+    return tsx
 
 ## Upsert transactions
 def upsert_transactions(t: Transaction) -> None:
@@ -39,6 +45,9 @@ def upsert_transactions(t: Transaction) -> None:
                     notes = excluded.notes;
                     """,
                    {"transaction_id": t.transaction_id, "account_id": t.account_id, "amount": t.amount, "description": t.description, "date": t.date, "merchant_name": t.merchant_name, "address": t.address, "zipcode": t.zipcode, "category": t.category, "plaid_category": t.plaid_category, "pending": t.pending, "notes": t.notes})
+    cx.commit()
+    cu.close()
+    cx.close()
 
 ## Delete transactions
 def delete_transactions(transactions: list[Transaction]) -> bool:
@@ -48,6 +57,9 @@ def delete_transactions(transactions: list[Transaction]) -> bool:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
     cu.executemany("DELETE * FROM transactions WHERE transaction_id = ?;", [(id,) for transaction_id in transactions])
+    cx.commit()
+    cu.close()
+    cx.close()
 
 
 # Sync State
@@ -59,6 +71,8 @@ def get_cursor(i: Item) -> SyncState:
     item_cursor: SyncState
     item_cursor.cursor = re.cursor
     item_cursor.account_id = re.account_id
+    cu.close()
+    cx.close()
     return item_cursor
 
 ## Set Cursor
@@ -70,6 +84,10 @@ def set_cursor(c: SyncState) -> None:
             ON CONFLICT(item_id) DO UPDATE SET
                 cursor = excluded.cursor
     ;""")
+    cx.commit()
+    cu.close()
+    cx.close()
+
 
 
 # Accounts
@@ -78,22 +96,22 @@ def get_account(a: Account) -> Account:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
     res = cu.execute("SELECT * FROM accounts WHERE account_id = ?", a.account_id)
+    cu.close()
+    cx.close()
 
-## Insert account
-def insert_account(a: Account) -> None:
+
+## Insert item
+def insert_item(i: Item) -> None:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    cu.execute("INSERT INTO accounts VALUES (?, ?, ?)", (a.account_id, a.item_id, a.type))
+    cu.execute("INSERT INTO items VALUES (?, ?)", (i.item_id, i.access_token))
+    cx.commit()
+    cu.close()
+    cx.close()
 
 # Items
 ## Get Item(s) for a given Account ID
 
-
-## Insert Item
-def insert_account(i: Item) -> None:
-    cx = get_connection(DB_PATH)
-    cu = cx.cursor()
-    cu.execute("INSERT INTO items VALUES (?, ?)", (i.item_id, i.access_token))
 
 
 ## Get Balance
@@ -101,4 +119,6 @@ def get_balance(i: Item) -> float:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
     res = cu.execute("SELECT balance FROM items WHERE item_id = ?", i.item_id)
+    cu.close()
+    cx.close()
     return res["balance"]

@@ -12,7 +12,7 @@ from plaid.model.transactions_sync_request import TransactionsSyncRequest
 from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
 from config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET, ACCESS_TOKEN, USER_ID
-from db import upsert_transactions, delete_transactions, insert_account
+from db import upsert_transactions, delete_transactions, insert_item
 from config import Item
 
 
@@ -47,7 +47,7 @@ def create_link_token():
         )
     )
     res = client.link_token_create(req)
-    return {"link_token": res.link_token}
+    return { "link_token": res.link_token }
 
 # Get public token
 def get_link_token():
@@ -64,8 +64,9 @@ def exchange_public_token(public_token: str) -> tuple[str, str]:
         item_id=res.item_id,
         access_token=res.access_token
     )
-    insert_account(item)
-    return res["access_token"], res["item_id"]
+    print("hit")
+    insert_item(item)
+    return res["item_id"]
 
 
 def sync_plaid_transactions():

@@ -23,7 +23,8 @@ def sync_transactions():
 
 @router.post("/link")
 def link_account():
-    return create_link_token()
+    res = create_link_token()
+    return {"status": "ok", "link_token": res}
 
 @router.post("/import-new-items")
 def import_items():
@@ -41,4 +42,5 @@ def import_items():
 
 @router.post("/exchange")
 def exchange(body: ExchangeRequest):
+    print(body.public_token)
     exchange_public_token(body.public_token)

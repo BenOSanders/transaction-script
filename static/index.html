@@ -34,9 +34,9 @@
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 
     <script>
-        loadTransaction()
+        loadTransactions();
 
-        function loadTransaction() {
+        function loadTransactions() {
             fetch("/api/transactions")
             .then(r => r.json())
             .then(data => {
@@ -62,17 +62,19 @@
             fetch("/api/sync", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
-            }).then(() => loadTransaction())
+            }).then(() => loadTransactions())
         }
 
         let handler = null;
 
         async function link() {
             res = await fetch('/api/link', { method: 'POST' });
+            console.log(res)
             const { link_token } = await res.json();
+            console.log(link_token);
 
             handler = Plaid.create({
-                token: link_token,
+                token: link_token["link_token"],
                 onSuccess: async (public_token, metadata) => {
                     await fetch('/api/exchange', {
                         method: 'POST',
@@ -91,7 +93,7 @@
             if (handler) {
                 handler.open()
             } else {
-                console.error('Plaid not initialized yet');
+                console.error('Plaid not initialized yet.');
             }
         });
 
