@@ -76,7 +76,7 @@
             handler = Plaid.create({
                 token: link_token["link_token"],
                 onSuccess: async (public_token, metadata) => {
-                    await fetch('/api/exchange', {
+                    await fetch('/api/connect', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ public_token })

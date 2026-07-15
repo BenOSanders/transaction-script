@@ -99,6 +99,14 @@ def get_account(a: Account) -> Account:
     cu.close()
     cx.close()
 
+## Insert account
+def insert_account(a: Account):
+    cx = get_connection(DB_PATH)
+    cu = cx.cursor()
+    res = cu.execute("INSERT INTO accounts VALUES (?, ?, ?, ?, ?)", a.account_id, a.item_id, a.acunt_name, a.balance, a.account_type)
+    cu.close()
+    cx.close()
+
 
 ## Insert item
 def insert_item(i: Item) -> None:

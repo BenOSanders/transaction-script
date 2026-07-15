@@ -3,7 +3,6 @@ from plaid.api import plaid_api
 from plaid.model.link_token_transactions import LinkTokenTransactions
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
-from plaid.model.link_token_create_hosted_link import LinkTokenCreateHostedLink
 from plaid.model.link_token_get_response import LinkTokenGetResponse
 from plaid.model.link_token_get_request import LinkTokenGetRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
@@ -11,9 +10,11 @@ from plaid.model.item_public_token_create_response import ItemPublicTokenCreateR
 from plaid.model.transactions_sync_request import TransactionsSyncRequest
 from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
+from plaid.model.accounts_get_request import AccountsGetRequest
+from plaid.model.accounts_get_response import AccountsGetResponse
 from config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET, ACCESS_TOKEN, USER_ID
-from db import upsert_transactions, delete_transactions, insert_item
-from config import Item
+from db import upsert_transactions, delete_transactions, insert_item, insert_account
+from config import Item, Account
 
 
 if ENVIRONMENT == "PRODUCTION": 
@@ -58,15 +59,34 @@ def get_link_token():
 
 # exchange public token
 def exchange_public_token(public_token: str) -> tuple[str, str]:
+    ''' Accepts a public token and exhcanges it with Plaid API for access token. 
+        Stores that access token and associated item ID in DB, and returns the item ID. 
+    '''
     req = ItemPublicTokenExchangeRequest(public_token=public_token)
     res : ItemPublicTokenCreateResponse = client.item_public_token_exchange(req)
     item = Item(
         item_id=res.item_id,
         access_token=res.access_token
     )
-    print("hit")
     insert_item(item)
-    return res["item_id"]
+    init_account(item)
+    return res.item_id
+
+def init_account(item: Item):
+    # get account data
+    req = AccountsGetRequest(
+        access_token=item.access_token
+    )
+    res: AccountsGetResponse = client.accounts_get(req)
+    for account in res.accounts:
+        new_account = Account(
+            account_id=account.account_id,
+            item_id=item.item_id,
+            name=account.name,
+            balance=account.balances.available,
+            type=account.type
+        )
+        insert_account(new_account) # inconsistent bevaior with how I load transactions
 
 
 def sync_plaid_transactions():

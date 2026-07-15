@@ -40,7 +40,12 @@ def import_items():
             )
         ) 
 
-@router.post("/exchange")
-def exchange(body: ExchangeRequest):
-    print(body.public_token)
-    exchange_public_token(body.public_token)
+@router.post("/connect")
+def connect(body: ExchangeRequest):
+    ''' This function triggers a multi step process when adding a new bank account. 
+        1. Exhanges public token for access token.
+        2. Run transaction sync that loads initial account info
+    '''
+    item_id = exchange_public_token(body.public_token)
+    # function to load in 
+    # load transactions
