@@ -25,7 +25,7 @@ class Account(BaseModel):
     account_id: str
     item_id: str
     name: str
-    balance: float
+    balance: float = 0.0
     type: str
 
 class Item(BaseModel):

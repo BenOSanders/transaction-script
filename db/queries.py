@@ -44,7 +44,21 @@ def upsert_transactions(t: Transaction) -> None:
                     pending = excluded.pending,
                     notes = excluded.notes;
                     """,
-                   {"transaction_id": t.transaction_id, "account_id": t.account_id, "amount": t.amount, "description": t.description, "date": t.date, "merchant_name": t.merchant_name, "address": t.address, "zipcode": t.zipcode, "category": t.category, "plaid_category": t.plaid_category, "pending": t.pending, "notes": t.notes})
+                   {
+                       "transaction_id": t.transaction_id, 
+                        "account_id": t.account_id, 
+                        "amount": t.amount, 
+                        "description": t.description, 
+                        "date": t.date, 
+                        "merchant_name": t.merchant_name, 
+                        "address": t.address, 
+                        "zipcode": t.zipcode, 
+                        "category": t.category, 
+                        "plaid_category": t.plaid_category, 
+                        "pending": t.pending, 
+                        "notes": t.notes
+                    }
+                )
     cx.commit()
     cu.close()
     cx.close()
@@ -103,7 +117,8 @@ def get_account(a: Account) -> Account:
 def insert_account(a: Account):
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    res = cu.execute("INSERT INTO accounts VALUES (?, ?, ?, ?, ?)", a.account_id, a.item_id, a.acunt_name, a.balance, a.account_type)
+    res = cu.execute("INSERT INTO accounts (account_id, item_id, account_name, balance, account_type) VALUES (:account_id, :item_id, :account_name, :balance, :account_type)", {"account_id": a.account_id, "item_id": a.item_id, "account_name": a.name, "balance": a.balance, "account_type": a.type})
+    cx.commit()
     cu.close()
     cx.close()
 

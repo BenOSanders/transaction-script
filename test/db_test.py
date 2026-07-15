@@ -8,6 +8,22 @@ cur = conn.cursor()
 #for row in cur.fetchall():
 #    print(row[0])
 
+print("Items:")
 cur.execute("SELECT * FROM items")
 for row in cur.fetchall():
     print(dict(row))
+
+
+print("Accounts:")
+cur.execute("SELECT * FROM accounts")
+for row in cur.fetchall():
+    print(dict(row))
+
+
+print("Transactions:")
+cur.execute("SELECT * FROM transactions LIMIT 10")
+for row in cur.fetchall():
+    print(dict(row))
+
+cur.close()
+conn.close()

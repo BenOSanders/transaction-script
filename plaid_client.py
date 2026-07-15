@@ -79,12 +79,17 @@ def init_account(item: Item):
     )
     res: AccountsGetResponse = client.accounts_get(req)
     for account in res.accounts:
+        if account.balances.available:
+            balance = account.balances.available
+        else:
+            balance = account.balances.current
+
         new_account = Account(
             account_id=account.account_id,
             item_id=item.item_id,
             name=account.name,
-            balance=account.balances.available,
-            type=account.type
+            balance=balance,
+            type=str(account.type)
         )
         insert_account(new_account) # inconsistent bevaior with how I load transactions
 
