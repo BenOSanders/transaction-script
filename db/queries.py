@@ -3,7 +3,10 @@ from config import Transaction, Account, SyncState, Item
 from config import DB_PATH
 from sqlite3 import Row
 
-# Transactions
+################
+# Transactions #
+################
+
 def get_transactions(i: Item) -> Row:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
@@ -12,13 +15,14 @@ def get_transactions(i: Item) -> Row:
     cx.close()    
     return tsx
 
-def get_all_transactions() -> Row:
+def get_all_transactions() -> dict:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    tsx = cu.execute("SELECT * FROM transactions").fetchmany()
+    rows = cu.execute("SELECT * FROM transactions").fetchall()
+    transactions = [dict(row) for row in rows]
     cu.close()
     cx.close()
-    return tsx
+    return transactions
 
 ## Upsert transactions
 def upsert_transactions(t: Transaction) -> None:
@@ -75,16 +79,22 @@ def delete_transactions(transactions: list[Transaction]) -> bool:
     cu.close()
     cx.close()
 
+##############
+# Sync State #
+##############
 
-# Sync State
 ## Get cursor
-def get_cursor(i: Item) -> SyncState:
+def get_cursor(item_id) -> SyncState:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    re = cu.execute("SELECT * FROM sync_state WHERE item_id = ?;", i.item_id)
+    print("item ID:", item_id)
+    re = cu.execute("SELECT * FROM sync_state WHERE item_id = ?", (item_id,)).fetchone()
     item_cursor: SyncState
-    item_cursor.cursor = re.cursor
-    item_cursor.account_id = re.account_id
+    if re["cursor"]:
+        item_cursor.cursor = re["cursor"]
+    else:
+        item_cursor.cursor = "null"
+    item_cursor.account_id = re["account_id"]
     cu.close()
     cx.close()
     return item_cursor
@@ -103,15 +113,37 @@ def set_cursor(c: SyncState) -> None:
     cx.close()
 
 
+############
+# Accounts #
+############
 
-# Accounts
-## Get accounts
+## Get account
 def get_account(a: Account) -> Account:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
     res = cu.execute("SELECT * FROM accounts WHERE account_id = ?", a.account_id)
+    row = res.fetchone()
+    account: Account = Account(
+        account_id=row["account_id"],
+        item_id=row["item_id"],
+        name=row["account_name"],
+        balance=row["balance"],
+        type=row["type"]
+    )
     cu.close()
     cx.close()
+    return account
+
+## Get all accounts
+def get_all_accounts() -> dict:
+    cx = get_connection(DB_PATH)
+    cu = cx.cursor()
+    res = cu.execute("SELECT * FROM accounts")
+    rows = res.fetchall() # Sqlite3 Row object
+    accounts = [dict(row) for row in rows] # Convert Row to Dict
+    cu.close()
+    cx.close()
+    return accounts
 
 ## Insert account
 def insert_account(a: Account):
@@ -122,6 +154,9 @@ def insert_account(a: Account):
     cu.close()
     cx.close()
 
+########
+# Item #
+########
 
 ## Insert item
 def insert_item(i: Item) -> None:
@@ -132,10 +167,19 @@ def insert_item(i: Item) -> None:
     cu.close()
     cx.close()
 
-# Items
-## Get Item(s) for a given Account ID
+## Get all items
+def get_all_items():
+    cx = get_connection(DB_PATH)
+    cu = cx.cursor()
+    rows = cu.execute("SELECT * FROM items").fetchall()
+    items = [dict(row) for row in rows]
+    cu.close()
+    cx.close()
+    return items
 
-
+########
+# Misc #
+########
 
 ## Get Balance
 def get_balance(i: Item) -> float:

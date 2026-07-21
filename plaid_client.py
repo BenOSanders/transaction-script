@@ -13,8 +13,8 @@ from plaid.model.country_code import CountryCode
 from plaid.model.accounts_get_request import AccountsGetRequest
 from plaid.model.accounts_get_response import AccountsGetResponse
 from config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET, ACCESS_TOKEN, USER_ID
-from db import upsert_transactions, delete_transactions, insert_item, insert_account
-from config import Item, Account
+from db import upsert_transactions, delete_transactions, insert_item, insert_account, get_all_items, get_cursor, set_cursor
+from config import Item, Account, SyncState
 
 
 if ENVIRONMENT == "PRODUCTION": 
@@ -95,26 +95,34 @@ def init_account(item: Item):
 
 
 def sync_plaid_transactions():
-    request = TransactionsSyncRequest(
-        access_token=ACCESS_TOKEN,
-    )
-    response = client.transactions_sync(request)
-    new_and_modified_tx = response['added']
-    new_and_modified_tx += response['modified']
-    deleted_tx = response['removed']
+    items = get_all_items()
+    for item in items:
+        print("Item ID From sync_plaid_transactions ", item["item_id"])
+        cursor: SyncState = get_cursor(item["item_id"])
 
-    while(response['has_more']):
         request = TransactionsSyncRequest(
-            access_token=ACCESS_TOKEN,
-            cursor=response['next_cursor']
+            access_token=item["access_token"],
+            cursor=cursor.cursor
         )
         response = client.transactions_sync(request)
-        new_and_modified_tx += response['added']
+        new_and_modified_tx = response['added']
         new_and_modified_tx += response['modified']
-        deleted_tx += response['removed']
+        deleted_tx = response['removed']
 
+        while(response['has_more']):
+            request = TransactionsSyncRequest(
+                access_token=item["access_token"],
+                cursor=response['next_cursor']
+            )
+            response = client.transactions_sync(request)
+            new_and_modified_tx += response['added']
+            new_and_modified_tx += response['modified']
+            deleted_tx += response['removed']
 
+        # pass into function to put into tuple of Transactions pydanic type for passing to upsert_transactions(t: tuple)
+        upsert_transactions(new_and_modified_tx)
+        delete_transactions(deleted_tx);
 
-    # pass into function to put into tuple of Transactions pydanic type for passing to upsert_transactions(t: tuple)
-    upsert_transactions(new_and_modified_tx)
-    delete_transactions(deleted_tx);
+        new_cursor: SyncState = SyncState(item_id=item["item_id"], cursor=response["cursor"])
+        # Update cursor
+        set_cursor(new_cursor)

@@ -25,5 +25,9 @@ cur.execute("SELECT * FROM transactions LIMIT 10")
 for row in cur.fetchall():
     print(dict(row))
 
+
+
+
+# Close DB connection
 cur.close()
 conn.close()

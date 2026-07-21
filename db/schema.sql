@@ -31,8 +31,9 @@ CREATE TABLE IF NOT EXISTS transactions (
 );
 
 CREATE TABLE IF NOT EXISTS sync_state (
-    sync_id TEXT PRIMARY KEY,
-    account_id TEXT,
+    sync_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_id TEXT,
     cursor TEXT NOT NULL,
-    FOREIGN KEY (account_id) REFERENCES accounts(account_id)
+    date TEXT NOT NULL,
+    FOREIGN KEY (item_id) REFERENCES items(item_id)
 );

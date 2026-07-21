@@ -22,6 +22,12 @@
             <tbody id="tx-body"></tbody>
         </table>
 
+        <h2>Accounts</h2>
+        <table id="acc-table">
+            <thead><tr><th>Account Name</th><th>Balance</th><th>Account Type</th></tr></thead>
+            <tbody id="acc-body"></tbody>
+        </table>
+
         <div id="chat-box">
             <h2>Ask about your finances</h2>
             <div id="messages"></div>
@@ -34,8 +40,6 @@
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 
     <script>
-        loadTransactions();
-
         function loadTransactions() {
             fetch("/api/transactions")
             .then(r => r.json())
@@ -55,6 +59,22 @@
                     <td>${tx.notes}</td>
                     </tr>`;
                 });
+            })
+        }
+
+        function loadAccounts() {
+            fetch("/api/accounts")
+            .then(r => r.json())
+            .then(data => {
+                const tableBody = document.getElementById("acc-body");
+                data.forEach(acc => {
+                    tableBody.innerHTML += `
+                    <tr>
+                        <td>${acc.account_name}</td>
+                        <td>$${acc.balance}</td>
+                        <td>${acc.account_type}</td>
+                    </tr>`;
+                })
             })
         }
 
@@ -98,5 +118,8 @@
         });
 
         link();
+        console.log("Loading Accounts...")
+        loadAccounts();
+        loadTransactions();
     </script>
 </html>
