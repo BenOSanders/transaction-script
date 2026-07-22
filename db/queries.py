@@ -8,7 +8,7 @@ from datetime import datetime
 # Transactions #
 ################
 
-def get_transactions(i: Item) -> Row:
+def get_transaction(i: Item) -> Transaction:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
     tsx = cu.execute("SELECT * FROM transactions WHERE item_id = ?;", i.item_id).fetchone()

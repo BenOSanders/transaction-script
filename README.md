@@ -6,7 +6,7 @@ Python app to gather transactions from linked bank accounts using Plaid API, sto
 
 # Roadmap
 
-- [ ] Plaid connection
+- [x] Plaid connection
 - [ ] Frontend dashboarding and transaction editing
 - [ ] API for external integration
 - [ ] Chatbot

@@ -12,14 +12,8 @@ class ExchangeRequest(BaseModel):
 
 @router.post("/sync")
 def sync_transactions():
-    # call sync function
     sync_plaid_transactions()
     return
-#
-#@router.get("/transactions")
-#def read_transactions() -> dict:
-#    transactions = get_all_transactions()
-#    return dict(transactions)
 
 @router.post("/link")
 def link_account():
