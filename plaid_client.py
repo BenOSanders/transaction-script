@@ -8,6 +8,7 @@ from plaid.model.link_token_get_request import LinkTokenGetRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
 from plaid.model.item_public_token_create_response import ItemPublicTokenCreateResponse
 from plaid.model.transactions_sync_request import TransactionsSyncRequest
+from plaid.model.transactions_sync_response import TransactionsSyncResponse
 from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
 from plaid.model.accounts_get_request import AccountsGetRequest
@@ -91,20 +92,18 @@ def init_account(item: Item):
             balance=balance,
             type=str(account.type)
         )
-        insert_account(new_account) # inconsistent bevaior with how I load transactions
+        insert_account(new_account) # inconsitent bevaior with how I load transactions
 
 
 def sync_plaid_transactions():
     items = get_all_items()
     for item in items:
-        print("Item ID From sync_plaid_transactions ", item["item_id"])
         cursor: SyncState = get_cursor(item["item_id"])
-
         request = TransactionsSyncRequest(
             access_token=item["access_token"],
-            cursor=cursor.cursor
+            cursor=cursor.cursor if cursor.cursor else ''
         )
-        response = client.transactions_sync(request)
+        response: TransactionsSyncResponse = client.transactions_sync(request)
         new_and_modified_tx = response['added']
         new_and_modified_tx += response['modified']
         deleted_tx = response['removed']
@@ -123,6 +122,6 @@ def sync_plaid_transactions():
         upsert_transactions(new_and_modified_tx)
         delete_transactions(deleted_tx);
 
-        new_cursor: SyncState = SyncState(item_id=item["item_id"], cursor=response["cursor"])
+        new_cursor: SyncState = SyncState(item_id=item["item_id"], cursor=response["next_cursor"])
         # Update cursor
         set_cursor(new_cursor)

@@ -44,8 +44,9 @@
             fetch("/api/transactions")
             .then(r => r.json())
             .then(data => {
+                console.log(data)
                 const tableBody = document.getElementById("tx-body");
-                data.transactions.forEach(tx => {
+                data.forEach(tx => {
                     tableBody.innerHTML += `
                     <tr>
                     <td>$${tx.amount.toFixed(2)}</td>
@@ -102,6 +103,7 @@
                         body: JSON.stringify({ public_token })
                     });
                     console.log("Link successful")
+                    loadAccounts()
                 },
                 onExit: (err, metadata) => {
                     if (err) console.log("Plaid link error:", err)

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-import datetime
+from datetime import datetime
 
 # Plaid Data Models
 class Transaction(BaseModel):
@@ -8,7 +8,7 @@ class Transaction(BaseModel):
     account_id: str
     amount: float
     description: str
-    date: datetime
+    date: str
     merchant_name: str
     address: str
     zipcode: str
@@ -18,9 +18,10 @@ class Transaction(BaseModel):
     notes: Optional[str] = None
 
 class SyncState(BaseModel):
-    accont_id: str
-    cursor: str
-    date: datetime
+    sync_id: Optional[str] = ''
+    item_id: str
+    cursor: Optional[str] = ''
+    date: Optional[str] = datetime.now().strftime(r"Y-%m-%d %H:%M:%S")
 
 class Account(BaseModel):
     account_id: str

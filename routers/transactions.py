@@ -6,5 +6,6 @@ router = APIRouter()
 # Get transactions
 @router.get("/transactions")
 def read_transactions():
-    return get_all_transactions()
-
+    transactions = get_all_transactions()
+    print(transactions)
+    return transactions

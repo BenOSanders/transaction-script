@@ -25,7 +25,10 @@ cur.execute("SELECT * FROM transactions LIMIT 10")
 for row in cur.fetchall():
     print(dict(row))
 
-
+print("Sync State")
+cur.execute("SELECT * FROM sync_state LIMIT 10")
+for row in cur.fetchall():
+    print(dict(row))
 
 
 # Close DB connection

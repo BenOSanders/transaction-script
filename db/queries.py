@@ -2,6 +2,7 @@ from db.connection import get_connection
 from config import Transaction, Account, SyncState, Item
 from config import DB_PATH
 from sqlite3 import Row
+from datetime import datetime
 
 ################
 # Transactions #
@@ -25,7 +26,7 @@ def get_all_transactions() -> dict:
     return transactions
 
 ## Upsert transactions
-def upsert_transactions(t: Transaction) -> None:
+def upsert_transactions(transactions) -> None:
     """
     Inputs many transactions into the database using executemany()
     @param t: tuple of transaction objects ({transaction-1}, ..., {transaction-n})
@@ -33,39 +34,41 @@ def upsert_transactions(t: Transaction) -> None:
 
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    cu.executemany("""INSERT INTO transactions (transaction_id, account_id, amount, description, date, merchant_name, address, zipcode, category, plaid_category, pending, notes) 
-                    VALUES (:transaction_id, :account_id, :amount, :description, :date, :merchant_name, :address, :zipcode, :category, :plaid_category, :pending, :notes
-                    ON CONFLICT(transaction_id) DO UPDATE SET
-                    account_id = excluded.account_id,
-                    amount = excluded.amount,
-                    description = excluded.description,
-                    date = excluded.date,
-                    merchant_name = excluded.merchant_name,
-                    address = excluded.address,
-                    zipcode = excluded.zipcode,
-                    category = excluded.category,
-                    plaid_category = excluded.plaid_category,
-                    pending = excluded.pending,
-                    notes = excluded.notes;
+    for t in transactions:
+        cu.execute("""INSERT INTO transactions (transaction_id, account_id, amount, description, date, merchant_name, address, zipcode, category, plaid, pending, notes) 
+                   VALUES (:transaction_id, :account_id, :amount, :description, :date, :merchant_name, :address, :zipcode, :category, :plaid, :pending, :notes)
+                   ON CONFLICT(transaction_id) DO UPDATE SET
+                        account_id = excluded.account_id,
+                        amount = excluded.amount,
+                        description = excluded.description,
+                        date = excluded.date,
+                        merchant_name = excluded.merchant_name,
+                        address = excluded.address,
+                        zipcode = excluded.zipcode,
+                        category = excluded.category,
+                        plaid = excluded.plaid,
+                        pending = excluded.pending,
+                        notes = excluded.notes;
                     """,
-                   {
-                       "transaction_id": t.transaction_id, 
+                    {
+                        "transaction_id": t.transaction_id, 
                         "account_id": t.account_id, 
                         "amount": t.amount, 
-                        "description": t.description, 
+                        "description": t.name, 
                         "date": t.date, 
                         "merchant_name": t.merchant_name, 
-                        "address": t.address, 
-                        "zipcode": t.zipcode, 
+                        "address": t.location.address, 
+                        "zipcode": t.location.postal_code, 
                         "category": t.category, 
-                        "plaid_category": t.plaid_category, 
+                        "plaid": t.personal_finance_category.primary, 
                         "pending": t.pending, 
-                        "notes": t.notes
+                        "notes": "",
                     }
                 )
     cx.commit()
     cu.close()
     cx.close()
+
 
 ## Delete transactions
 def delete_transactions(transactions: list[Transaction]) -> bool:
@@ -74,7 +77,7 @@ def delete_transactions(transactions: list[Transaction]) -> bool:
     """
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    cu.executemany("DELETE * FROM transactions WHERE transaction_id = ?;", [(id,) for transaction_id in transactions])
+    cu.executemany("DELETE FROM transactions WHERE transaction_id = ?;", [(id,) for transaction_id in transactions])
     cx.commit()
     cu.close()
     cx.close()
@@ -84,17 +87,22 @@ def delete_transactions(transactions: list[Transaction]) -> bool:
 ##############
 
 ## Get cursor
-def get_cursor(item_id) -> SyncState:
+def get_cursor(item_id: str) -> SyncState:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    print("item ID:", item_id)
     re = cu.execute("SELECT * FROM sync_state WHERE item_id = ?", (item_id,)).fetchone()
-    item_cursor: SyncState
-    if re["cursor"]:
+    
+    item_cursor: SyncState = SyncState(item_id=item_id)
+    if re:
         item_cursor.cursor = re["cursor"]
+        item_cursor.date = re["date"]
+        item_cursor.sync_id = re["sync_id"]
     else:
-        item_cursor.cursor = "null"
-    item_cursor.account_id = re["account_id"]
+        item_cursor.cursor = ""
+        item_cursor.date = datetime.now().strftime(r"Y-%m-%d %H:%M:%S")
+        item_cursor.sync_id = ""
+
+    print(item_cursor)
     cu.close()
     cx.close()
     return item_cursor
@@ -103,11 +111,18 @@ def get_cursor(item_id) -> SyncState:
 def set_cursor(c: SyncState) -> None:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    cu.execute("""INSERT INTO sync_state (item_id, cursor)
-            VALUES (@item_id, @cursor)
-            ON CONFLICT(item_id) DO UPDATE SET
-                cursor = excluded.cursor
-    ;""")
+    print(type(c.date))
+    cu.execute("""INSERT INTO sync_state (item_id, cursor, date)
+            VALUES (:item_id, :cursor, :date)
+            ON CONFLICT(sync_id) DO UPDATE SET
+                item_id = excluded.item_id,
+                cursor = excluded.cursor,
+                date = excluded.date
+    ;""", {
+        "item_id": c.item_id,
+        "cursor": c.cursor,
+        "date": c.date
+    })
     cx.commit()
     cu.close()
     cx.close()
@@ -138,8 +153,7 @@ def get_account(a: Account) -> Account:
 def get_all_accounts() -> dict:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    res = cu.execute("SELECT * FROM accounts")
-    rows = res.fetchall() # Sqlite3 Row object
+    rows = cu.execute("SELECT * FROM accounts").fetchall() # Sqlite3 Row object
     accounts = [dict(row) for row in rows] # Convert Row to Dict
     cu.close()
     cx.close()
