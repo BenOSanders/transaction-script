@@ -95,7 +95,7 @@ def init_account(item: Item):
         insert_account(new_account) # inconsitent bevaior with how I load transactions
 
 
-def sync_plaid_transactions():
+def sync_plaid_transactions() -> dict:
     items = get_all_items()
     for item in items:
         cursor: SyncState = get_cursor(item["item_id"])
@@ -104,8 +104,8 @@ def sync_plaid_transactions():
             cursor=cursor.cursor if cursor.cursor else ''
         )
         response: TransactionsSyncResponse = client.transactions_sync(request)
-        new_and_modified_tx = response['added']
-        new_and_modified_tx += response['modified']
+        added_tx = response['added']
+        modified_tx += response['modified']
         deleted_tx = response['removed']
 
         while(response['has_more']):
@@ -114,14 +114,11 @@ def sync_plaid_transactions():
                 cursor=response['next_cursor']
             )
             response = client.transactions_sync(request)
-            new_and_modified_tx += response['added']
-            new_and_modified_tx += response['modified']
+            added_tx += response['added']
+            modified_tx += response['modified']
             deleted_tx += response['removed']
-
-        # pass into function to put into tuple of Transactions pydanic type for passing to upsert_transactions(t: tuple)
-        upsert_transactions(new_and_modified_tx)
-        delete_transactions(deleted_tx);
 
         new_cursor: SyncState = SyncState(item_id=item["item_id"], cursor=response["next_cursor"])
         # Update cursor
         set_cursor(new_cursor)
+        return {"Added Transactions": added_tx, "Modified Transactions": modified_tx, "Deleted Transactions": deleted_tx, "Cursor": new_cursor}

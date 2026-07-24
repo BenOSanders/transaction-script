@@ -99,7 +99,7 @@ def get_cursor(item_id: str) -> SyncState:
         item_cursor.sync_id = re["sync_id"]
     else:
         item_cursor.cursor = ""
-        item_cursor.date = datetime.now().strftime(r"Y-%m-%d %H:%M:%S")
+        item_cursor.date = datetime.now().strftime("Y-%m-%d")
         item_cursor.sync_id = ""
 
     print(item_cursor)

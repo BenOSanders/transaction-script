@@ -1,8 +1,9 @@
 import plaid
 from fastapi import APIRouter
 from db import get_all_transactions
-from plaid_client import sync_plaid_transactions, create_link_token, get_link_token, exchange_public_token
+from plaid_client import create_link_token, get_link_token, exchange_public_token
 from config import Item
+from services import sync_transactions
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -11,8 +12,8 @@ class ExchangeRequest(BaseModel):
     public_token: str
 
 @router.post("/sync")
-def sync_transactions():
-    sync_plaid_transactions()
+def sync():
+    sync_transactions()
     return
 
 @router.post("/link")
