@@ -1,14 +1,16 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+from plaid.model.transactions_sync_response import TransactionsSyncResponse
 
-# Plaid Data Models
-class Transaction(BaseModel):
+# Plaid Data 
+class Transaction(TransactionsSyncResponse): 
     transaction_id: str
     account_id: str
     amount: float
     description: str
     date: str
+    auth_date: str
     merchant_name: str
     address: str
     zipcode: str

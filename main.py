@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from config import Item
 from sqlite3 import Row
-from routers import transactions, plaid, chat, accounts
+from routers import transactions, plaid, accounts
 from db import init_db
 from config import DB_PATH
 

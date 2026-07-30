@@ -19,7 +19,7 @@ def get_transaction(i: Item) -> Transaction:
 def get_all_transactions() -> dict:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    rows = cu.execute("SELECT * FROM transactions").fetchall()
+    rows = cu.execute("SELECT * FROM transactions ORDER BY date DESC").fetchall()
     transactions = [dict(row) for row in rows]
     cu.close()
     cx.close()
@@ -28,8 +28,8 @@ def get_all_transactions() -> dict:
 ## Upsert transactions
 def upsert_transactions(transactions) -> None:
     """
-    Inputs many transactions into the database using executemany()
-    @param t: tuple of transaction objects ({transaction-1}, ..., {transaction-n})
+    Inputs many transactions into the database
+    @param t: tuple of TransactionResponse objects ({transaction-1}, ..., {transaction-n})
     """
 
     cx = get_connection(DB_PATH)
@@ -57,10 +57,10 @@ def upsert_transactions(transactions) -> None:
                         "description": t.name, 
                         "date": t.date, 
                         "merchant_name": t.merchant_name, 
-                        "address": t.location.address, 
-                        "zipcode": t.location.postal_code, 
+                        "address": t.address, 
+                        "zipcode": t.zipcode, 
                         "category": t.category, 
-                        "plaid": t.personal_finance_category.primary, 
+                        "plaid": t.plaid_category, 
                         "pending": t.pending, 
                         "notes": "",
                     }
@@ -111,7 +111,6 @@ def get_cursor(item_id: str) -> SyncState:
 def set_cursor(c: SyncState) -> None:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    print(type(c.date))
     cu.execute("""INSERT INTO sync_state (item_id, cursor, date)
             VALUES (:item_id, :cursor, :date)
             ON CONFLICT(sync_id) DO UPDATE SET

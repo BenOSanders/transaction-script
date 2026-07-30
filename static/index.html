@@ -12,35 +12,28 @@
             #messages { height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 8px; }
             #chat-input { width: 80%; padding: 8px; }
         </style>
+
+        <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
     </head>
     <body>
-        <h2>Transactions</h2>
-        <button onclick="sync()">Sync</button>
-        <button id="link-btn">Add Bank Account</button>
-        <table id="tx-table">
-            <thead><tr><th>Amount</th><th>Description</th><th>Date</th><th>Merchant Name</th><th>Category</th><th>Address</th><th>Zipcode</th><th>Pending</th><th>Notes</th></tr></thead>
-            <tbody id="tx-body"></tbody>
-        </table>
-
-        <h2>Accounts</h2>
-        <table id="acc-table">
-            <thead><tr><th>Account Name</th><th>Balance</th><th>Account Type</th></tr></thead>
-            <tbody id="acc-body"></tbody>
-        </table>
-
-        <div id="chat-box">
-            <h2>Ask about your finances</h2>
-            <div id="messages"></div>
-            <input id="chat-input" placeholder="e.g. How much did I spend on food last month?" />
-            <button onclick="sendMessage()">Send</button>
+        <header>
+            <h1>Homefin</h1>
+            <button onclick="sync()">Update Transactions</button>
+            <button id="link-btn">Add Bank Account</button>
+        </header>
+        <div>
+            <h2>Transactions</h2>
+            <div id="myGrid" style="height: 100vw"></div>
         </div>
+
+
 
     </body>
 
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 
     <script>
-        function loadTransactions() {
+        /*function loadTransactions() {
             fetch("/api/transactions")
             .then(r => r.json())
             .then(data => {
@@ -59,6 +52,30 @@
                     <td>${tx.notes}</td>
                     </tr>`;
                 });
+            })
+        }*/
+
+        function loadTransactions() {
+            fetch("/api/transactions")
+            .then(r => r.json())
+            .then(data => {
+                data.forEach(tx => {
+                    gridOptions.rowData.push(
+                        {
+                            "amount": tx.amount,
+                            "description": tx.description,
+                            "date": tx.date,
+                            "merchant": tx.merchant_name,
+                            "category": tx.category,
+                            "address": tx.address,
+                            "zipcode": tx.zipcode,
+                            "pending": tx.pending,
+                            "notes": tx.notes
+                        }
+                    )
+                })
+                agGrid.createGrid(myGridElement, gridOptions);
+
             })
         }
 
@@ -114,6 +131,32 @@
                 console.error('Plaid not initialized yet.');
             }
         });
+
+        // AG GRID
+        //import { themeBalham } from 'ag-grid-community';
+
+        // Grid Options: Contains all of the Data Grid configurations
+        const gridOptions = {
+            // Row Data: The data to be displayed.
+            rowData: [
+            ],
+            // Column Definitions: Defines the columns to be displayed.
+            columnDefs: [
+                { field: "amount" },
+                { field: "description" },
+                { field: "date" },
+                { field: "merchant" },
+                { field: "category" },
+                { field: "address" },
+                { field: "zipcode" },
+                { field: "pending" },
+                { field: "notes" }
+            ]
+        };
+
+        // Your Javascript code to create the Data Grid
+        const myGridElement = document.querySelector('#myGrid');
+        //agGrid.createGrid(myGridElement, gridOptions);
 
         link();
         loadTransactions();
