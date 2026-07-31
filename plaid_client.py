@@ -3,12 +3,16 @@ from plaid.api import plaid_api
 from plaid.model.accounts_get_request import AccountsGetRequest
 from plaid.model.accounts_get_response import AccountsGetResponse
 from plaid.model.country_code import CountryCode
-from plaid.model.item_public_token_create_response import ItemPublicTokenCreateResponse
+from plaid.model.item_public_token_create_response import (
+    ItemPublicTokenCreateResponse,
+)
 from plaid.model.item_public_token_exchange_request import (
     ItemPublicTokenExchangeRequest,
 )
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
-from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
+from plaid.model.link_token_create_request_user import (
+    LinkTokenCreateRequestUser,
+)
 from plaid.model.link_token_get_request import LinkTokenGetRequest
 from plaid.model.link_token_get_response import LinkTokenGetResponse
 from plaid.model.link_token_transactions import LinkTokenTransactions
@@ -98,7 +102,9 @@ def init_account(item: Item):
             balance=balance,
             type=str(account.type),
         )
-        insert_account(new_account)  # inconsitent bevaior with how I load transactions
+        insert_account(
+            new_account
+        )  # inconsitent bevaior with how I load transactions
 
 
 def sync_plaid_transactions() -> dict:
@@ -119,10 +125,13 @@ def sync_plaid_transactions() -> dict:
 
         while data["has_more"]:
             request = TransactionsSyncRequest(
-                access_token=item["access_token"], cursor=response["next_cursor"]
+                access_token=item["access_token"],
+                cursor=response["next_cursor"],
             )
             print(request)
-            response: TransactionsSyncRequest = client.transactions_sync(request)
+            response: TransactionsSyncRequest = client.transactions_sync(
+                request
+            )
             data = response.to_dict()
             added_tx += data["added"]
             modified_tx += data["modified"]

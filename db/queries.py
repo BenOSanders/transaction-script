@@ -22,7 +22,9 @@ def get_transaction(i: Item) -> Transaction:
 def get_all_transactions() -> dict:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    rows = cu.execute("SELECT * FROM transactions ORDER BY date DESC").fetchall()
+    rows = cu.execute(
+        "SELECT * FROM transactions ORDER BY date DESC"
+    ).fetchall()
     transactions = [dict(row) for row in rows]
     cu.close()
     cx.close()
@@ -100,7 +102,9 @@ def delete_transactions(transactions: list[Transaction]) -> bool:
 def get_cursor(item_id: str) -> SyncState:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    re = cu.execute("SELECT * FROM sync_state WHERE item_id = ?", (item_id,)).fetchone()
+    re = cu.execute(
+        "SELECT * FROM sync_state WHERE item_id = ?", (item_id,)
+    ).fetchone()
 
     item_cursor: SyncState = SyncState(item_id=item_id)
     if re:
@@ -146,7 +150,9 @@ def set_cursor(c: SyncState) -> None:
 def get_account(a: Account) -> Account:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    res = cu.execute("SELECT * FROM accounts WHERE account_id = ?", a.account_id)
+    res = cu.execute(
+        "SELECT * FROM accounts WHERE account_id = ?", a.account_id
+    )
     row = res.fetchone()
     account: Account = Account(
         account_id=row["account_id"],
@@ -164,7 +170,9 @@ def get_account(a: Account) -> Account:
 def get_all_accounts() -> dict:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    rows = cu.execute("SELECT * FROM accounts").fetchall()  # Sqlite3 Row object
+    rows = cu.execute(
+        "SELECT * FROM accounts"
+    ).fetchall()  # Sqlite3 Row object
     accounts = [dict(row) for row in rows]  # Convert Row to Dict
     cu.close()
     cx.close()

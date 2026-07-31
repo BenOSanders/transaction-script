@@ -2,7 +2,11 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from config import Item
-from plaid_client import create_link_token, exchange_public_token, get_link_token
+from plaid_client import (
+    create_link_token,
+    exchange_public_token,
+    get_link_token,
+)
 from services import sync_transactions
 
 router = APIRouter()
