@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from pydantic import BaseModel
 
@@ -17,15 +17,14 @@ class Transaction(BaseModel):
     category: str | None = None
     plaid_category: str
     pending: bool
-    import_date: str | None = datetime.now().strftime(r"%y-%m-%d")
+    import_date: str | None = datetime.now(UTC).strftime(r"%y-%m-%d")
     notes: str | None = None
 
 
 class SyncState(BaseModel):
-    sync_id: str | None = ""
     item_id: str
     cursor: str | None = ""
-    date: str | None = datetime.now().strftime(r"y-%m-%d %H:%M:%S")
+    updated_at: str | None = datetime.now(UTC).strftime(r"y-%m-%d %H:%M:%S")
 
 
 class Account(BaseModel):

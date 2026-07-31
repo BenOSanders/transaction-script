@@ -33,9 +33,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 );
 
 CREATE TABLE IF NOT EXISTS sync_state (
-    sync_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    item_id TEXT,
-    cursor TEXT NOT NULL,
-    date TEXT NOT NULL,
-    FOREIGN KEY (item_id) REFERENCES items(item_id)
+    item_id TEXT PRIMARY KEY REFERENCES items(item_id) ON DELETE CASCADE,
+    cursor TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL
 );

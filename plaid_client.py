@@ -34,7 +34,6 @@ from db import (
     get_cursor,
     insert_account,
     insert_item,
-    set_cursor,
 )
 
 if ENVIRONMENT == "PRODUCTION":
@@ -137,10 +136,10 @@ def sync_plaid_transactions() -> dict:
         new_cursor: SyncState = SyncState(
             item_id=item["item_id"], cursor=data["next_cursor"]
         )
-        # Update cursor
-        set_cursor(new_cursor) # TODO: Move this so the cursor is only saved once all transactions are fully processed
+
         return {
             "Added Transactions": added_tx,
             "Modified Transactions": modified_tx,
             "Deleted Transactions": deleted_tx,
+            "Cursor": new_cursor,
         }

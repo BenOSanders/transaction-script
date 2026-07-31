@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from config import DB_PATH, Account, Item, SyncState, Transaction
 from db.connection import get_connection
 
@@ -113,14 +111,8 @@ def get_cursor(item_id: str) -> SyncState:
     item_cursor: SyncState = SyncState(item_id=item_id)
     if re:
         item_cursor.cursor = re["cursor"]
-        item_cursor.date = re["date"]
-        item_cursor.sync_id = re["sync_id"]
-    else:
-        item_cursor.cursor = ""
-        item_cursor.date = datetime.now().strftime("Y-%m-%d")
-        item_cursor.sync_id = ""
+        item_cursor.updated_at = re["updated_at"]
 
-    print(item_cursor)
     cu.close()
     cx.close()
     return item_cursor
@@ -131,14 +123,18 @@ def set_cursor(c: SyncState) -> None:
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
     cu.execute(
-        """INSERT INTO sync_state (item_id, cursor, date)
-            VALUES (:item_id, :cursor, :date)
-            ON CONFLICT(sync_id) DO UPDATE SET
+        """INSERT INTO sync_state (item_id, cursor, updated_at)
+            VALUES (:item_id, :cursor, :updated_at)
+            ON CONFLICT(item_id) DO UPDATE SET
                 item_id = excluded.item_id,
                 cursor = excluded.cursor,
-                date = excluded.date
+                updated_at = excluded.updated_at
     ;""",
-        {"item_id": c.item_id, "cursor": c.cursor, "date": c.date},
+        {
+            "item_id": c.item_id,
+            "cursor": c.cursor,
+            "updated_at": c.updated_at,
+        },
     )
     cx.commit()
     cu.close()
