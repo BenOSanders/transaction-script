@@ -27,4 +27,4 @@ __all__ = [
     "insert_item",
     "set_cursor",
     "upsert_transactions",
-    ]
+]

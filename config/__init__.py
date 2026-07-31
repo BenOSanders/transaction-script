@@ -18,5 +18,5 @@ __all__ = [
     "Account",
     "Item",
     "SyncState",
-    "Transaction"
+    "Transaction",
 ]

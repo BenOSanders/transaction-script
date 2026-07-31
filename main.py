@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -17,6 +16,6 @@ app.include_router(accounts.router, prefix="/api")
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
-#@app.get('/')
-#def root():
+# @app.get('/')
+# def root():
 #    return {"html": ./static/index.html}

@@ -8,6 +8,7 @@ def get_connection(db_path):
     cx.execute("PRAGMA journal_mode = ON;")
     return cx
 
+
 def init_db(db_path):
     cx = get_connection(db_path)
     with open("db/schema.sql", "r") as f:

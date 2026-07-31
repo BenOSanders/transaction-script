@@ -5,8 +5,8 @@ conn.row_factory = sqlite3.Row
 cur = conn.cursor()
 
 
-#cur.execute("SELECT sql FROM sqlite_master WHERE type='table'")
-#for row in cur.fetchall():
+# cur.execute("SELECT sql FROM sqlite_master WHERE type='table'")
+# for row in cur.fetchall():
 #    print(row[0])
 
 print("Items:")
