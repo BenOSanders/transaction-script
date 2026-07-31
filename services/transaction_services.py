@@ -26,6 +26,7 @@ def to_transaction_model(transactions: list) -> list:
     """
     processed_transactions = []
     for t in transactions:
+        print(type(t["merchant_name"]))
         processed_transactions.append(Transaction(
             transaction_id=t["transaction_id"],
             account_id=t["account_id"],
@@ -43,6 +44,7 @@ def to_transaction_model(transactions: list) -> list:
             category="",
             plaid_category=t["personal_finance_category"]["primary"],
             pending=t["pending"],
+            import_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             notes=""
         ))
 

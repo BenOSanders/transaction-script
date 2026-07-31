@@ -42,19 +42,21 @@ def upsert_transactions(transactions) -> None:
     cu = cx.cursor()
     for t in transactions:
         cu.execute(
-            """INSERT INTO transactions (transaction_id, account_id, amount, description, date, merchant_name, address, zipcode, category, plaid, pending, notes) 
-                   VALUES (:transaction_id, :account_id, :amount, :description, :date, :merchant_name, :address, :zipcode, :category, :plaid, :pending, :notes)
+            """INSERT INTO transactions (transaction_id, account_id, amount, description, date, auth_date, merchant_name, address, zipcode, category, plaid, pending, import_date, notes) 
+                   VALUES (:transaction_id, :account_id, :amount, :description, :date, :auth_date, :merchant_name, :address, :zipcode, :category, :plaid, :pending, :import_date, :notes)
                    ON CONFLICT(transaction_id) DO UPDATE SET
                         account_id = excluded.account_id,
                         amount = excluded.amount,
                         description = excluded.description,
                         date = excluded.date,
+                        auth_date = excluded.auth_date,
                         merchant_name = excluded.merchant_name,
                         address = excluded.address,
                         zipcode = excluded.zipcode,
                         category = excluded.category,
                         plaid = excluded.plaid,
                         pending = excluded.pending,
+                        import_date = excluded.import_date,
                         notes = excluded.notes;
                     """,
             {
@@ -63,12 +65,14 @@ def upsert_transactions(transactions) -> None:
                 "amount": t.amount,
                 "description": t.description,
                 "date": t.date,
+                "auth_date": t.auth_date,
                 "merchant_name": t.merchant_name,
                 "address": t.address,
                 "zipcode": t.zipcode,
                 "category": t.category,
                 "plaid": t.plaid_category,
                 "pending": t.pending,
+                "import_date": t.import_date,
                 "notes": "",
             },
         )

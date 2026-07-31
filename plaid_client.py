@@ -138,7 +138,7 @@ def sync_plaid_transactions() -> dict:
             item_id=item["item_id"], cursor=data["next_cursor"]
         )
         # Update cursor
-        set_cursor(new_cursor)
+        set_cursor(new_cursor) # TODO: Move this so the cursor is only saved once all transactions are fully processed
         return {
             "Added Transactions": added_tx,
             "Modified Transactions": modified_tx,

@@ -11,12 +11,13 @@ class Transaction(BaseModel):
     description: str
     date: str | None = None
     auth_date: str | None = None
-    merchant_name: str
+    merchant_name: str | None = ""
     address: str | None = None
     zipcode: str | None = None
     category: str | None = None
     plaid_category: str
     pending: bool
+    import_date: str | None = datetime.now().strftime(r"%y-%m-%d")
     notes: str | None = None
 
 
