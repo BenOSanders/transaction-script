@@ -1,22 +1,37 @@
 import plaid
 from plaid.api import plaid_api
-from plaid.model.link_token_transactions import LinkTokenTransactions
-from plaid.model.link_token_create_request import LinkTokenCreateRequest
-from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
-from plaid.model.link_token_get_response import LinkTokenGetResponse
-from plaid.model.link_token_get_request import LinkTokenGetRequest
-from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
-from plaid.model.item_public_token_create_response import ItemPublicTokenCreateResponse
-from plaid.model.transactions_sync_request import TransactionsSyncRequest
-from plaid.model.transactions_sync_response import TransactionsSyncResponse
-from plaid.model.products import Products
-from plaid.model.country_code import CountryCode
 from plaid.model.accounts_get_request import AccountsGetRequest
 from plaid.model.accounts_get_response import AccountsGetResponse
-from config import ENVIRONMENT, CLIENT_ID, PLAID_SECRET, ACCESS_TOKEN, USER_ID
-from db import upsert_transactions, delete_transactions, insert_item, insert_account, get_all_items, get_cursor, set_cursor
-from config import Item, Account, SyncState
+from plaid.model.country_code import CountryCode
+from plaid.model.item_public_token_create_response import ItemPublicTokenCreateResponse
+from plaid.model.item_public_token_exchange_request import (
+    ItemPublicTokenExchangeRequest,
+)
+from plaid.model.link_token_create_request import LinkTokenCreateRequest
+from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
+from plaid.model.link_token_get_request import LinkTokenGetRequest
+from plaid.model.link_token_get_response import LinkTokenGetResponse
+from plaid.model.link_token_transactions import LinkTokenTransactions
+from plaid.model.products import Products
+from plaid.model.transactions_sync_request import TransactionsSyncRequest
+from plaid.model.transactions_sync_response import TransactionsSyncResponse
 
+from config import (
+    CLIENT_ID,
+    ENVIRONMENT,
+    PLAID_SECRET,
+    USER_ID,
+    Account,
+    Item,
+    SyncState,
+)
+from db import (
+    get_all_items,
+    get_cursor,
+    insert_account,
+    insert_item,
+    set_cursor,
+)
 
 if ENVIRONMENT == "PRODUCTION": 
     ENV = plaid.Environment.Production
@@ -103,7 +118,8 @@ def sync_plaid_transactions() -> dict:
             access_token=item["access_token"],
             cursor=cursor.cursor if cursor.cursor else ''
         )
-        print(request)
+        #print(request)
+        
         response: TransactionsSyncResponse = client.transactions_sync(request)
         data = response.to_dict()
         added_tx = data['added']

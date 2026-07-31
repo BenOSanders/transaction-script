@@ -1,8 +1,7 @@
-from db.connection import get_connection
-from config import Transaction, Account, SyncState, Item
-from config import DB_PATH
-from sqlite3 import Row
 from datetime import datetime
+
+from config import DB_PATH, Account, Item, SyncState, Transaction
+from db.connection import get_connection
 
 ################
 # Transactions #
@@ -162,7 +161,7 @@ def get_all_accounts() -> dict:
 def insert_account(a: Account):
     cx = get_connection(DB_PATH)
     cu = cx.cursor()
-    res = cu.execute("INSERT INTO accounts (account_id, item_id, account_name, balance, account_type) VALUES (:account_id, :item_id, :account_name, :balance, :account_type)", {"account_id": a.account_id, "item_id": a.item_id, "account_name": a.name, "balance": a.balance, "account_type": a.type})
+    cu.execute("INSERT INTO accounts (account_id, item_id, account_name, balance, account_type) VALUES (:account_id, :item_id, :account_name, :balance, :account_type)", {"account_id": a.account_id, "item_id": a.item_id, "account_name": a.name, "balance": a.balance, "account_type": a.type})
     cx.commit()
     cu.close()
     cx.close()

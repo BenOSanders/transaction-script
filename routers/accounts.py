@@ -1,6 +1,7 @@
+
+from fastapi import APIRouter
+
 from db import get_all_accounts
-from fastapi import APIRouter, HTTPException
-import json
 
 router = APIRouter()
 

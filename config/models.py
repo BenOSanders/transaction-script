@@ -1,7 +1,8 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+
 from plaid.model.transactions_sync_response import TransactionsSyncResponse
+from pydantic import BaseModel
+
 
 # Plaid Data 
 class Transaction(TransactionsSyncResponse): 
@@ -14,16 +15,16 @@ class Transaction(TransactionsSyncResponse):
     merchant_name: str
     address: str
     zipcode: str
-    category: Optional[str] = None
+    category: str | None = None
     plaid_category: str
     pending: bool
-    notes: Optional[str] = None
+    notes: str | None = None
 
 class SyncState(BaseModel):
-    sync_id: Optional[str] = ''
+    sync_id: str | None = ''
     item_id: str
-    cursor: Optional[str] = ''
-    date: Optional[str] = datetime.now().strftime(r"Y-%m-%d %H:%M:%S")
+    cursor: str | None = ''
+    date: str | None = datetime.now().strftime(r"Y-%m-%d %H:%M:%S")
 
 class Account(BaseModel):
     account_id: str

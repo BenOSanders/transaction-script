@@ -1,6 +1,7 @@
-from db import get_all_transactions
 from fastapi import APIRouter
 from pydantic import BaseModel
+
+from db import get_all_transactions
 
 router = APIRouter()
 

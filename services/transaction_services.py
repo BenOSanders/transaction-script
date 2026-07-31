@@ -1,6 +1,7 @@
-from db import upsert_transactions, delete_transactions, set_cursor
-from plaid_client import sync_plaid_transactions
 from config import Transaction
+from db import delete_transactions, set_cursor, upsert_transactions
+from plaid_client import sync_plaid_transactions
+
 
 def sync_transactions():
     """Called by sync API endpoint. Runs Plaid Sync Transactions function to get transaction data from Plaid, 
