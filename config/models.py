@@ -1,20 +1,19 @@
 from datetime import datetime
 
-from plaid.model.transactions_sync_response import TransactionsSyncResponse
 from pydantic import BaseModel
 
 
 # Plaid Data
-class Transaction(TransactionsSyncResponse):
+class Transaction(BaseModel):
     transaction_id: str
     account_id: str
     amount: float
     description: str
-    date: str
-    auth_date: str
+    date: str | None = None
+    auth_date: str | None = None
     merchant_name: str
-    address: str
-    zipcode: str
+    address: str | None = None
+    zipcode: str | None = None
     category: str | None = None
     plaid_category: str
     pending: bool
@@ -25,7 +24,7 @@ class SyncState(BaseModel):
     sync_id: str | None = ""
     item_id: str
     cursor: str | None = ""
-    date: str | None = datetime.now().strftime(r"Y-%m-%d %H:%M:%S")
+    date: str | None = datetime.now().strftime(r"y-%m-%d %H:%M:%S")
 
 
 class Account(BaseModel):

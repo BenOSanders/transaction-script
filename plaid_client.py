@@ -115,24 +115,21 @@ def sync_plaid_transactions() -> dict:
             access_token=item["access_token"],
             cursor=cursor.cursor if cursor.cursor else "",
         )
-        # print(request)
 
-        response: TransactionsSyncResponse = client.transactions_sync(request)
-        data = response.to_dict()
-        added_tx = data["added"]
+        data: TransactionsSyncResponse = client.transactions_sync(request)
+        data = data.to_dict()
+
+        added_tx: list = data["added"]
         modified_tx = data["modified"]
         deleted_tx = data["removed"]
 
         while data["has_more"]:
             request = TransactionsSyncRequest(
                 access_token=item["access_token"],
-                cursor=response["next_cursor"],
+                cursor=data["next_cursor"],
             )
-            print(request)
-            response: TransactionsSyncRequest = client.transactions_sync(
-                request
-            )
-            data = response.to_dict()
+            data: TransactionsSyncResponse = client.transactions_sync(request)
+            data = data.to_dict()
             added_tx += data["added"]
             modified_tx += data["modified"]
             deleted_tx += data["removed"]
@@ -146,5 +143,4 @@ def sync_plaid_transactions() -> dict:
             "Added Transactions": added_tx,
             "Modified Transactions": modified_tx,
             "Deleted Transactions": deleted_tx,
-            "Cursor": new_cursor,
         }

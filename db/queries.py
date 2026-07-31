@@ -61,7 +61,7 @@ def upsert_transactions(transactions) -> None:
                 "transaction_id": t.transaction_id,
                 "account_id": t.account_id,
                 "amount": t.amount,
-                "description": t.name,
+                "description": t.description,
                 "date": t.date,
                 "merchant_name": t.merchant_name,
                 "address": t.address,
