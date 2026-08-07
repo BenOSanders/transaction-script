@@ -50,7 +50,7 @@ def upsert_transactions(transactions) -> None:
                         auth_date = excluded.auth_date,
                         merchant_name = excluded.merchant_name,
                         merchant_id = excluded.merchant_id,
-                        merchant_logo_url = excluded.merchant_logo_id,
+                        merchant_logo_url = excluded.merchant_logo_url,
                         address = excluded.address,
                         zipcode = excluded.zipcode,
                         city = excluded.city,
