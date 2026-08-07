@@ -40,8 +40,8 @@ def upsert_transactions(transactions) -> None:
     cu = cx.cursor()
     for t in transactions:
         cu.execute(
-            """INSERT INTO transactions (transaction_id, account_id, amount, description, date, auth_date, merchant_name, address, zipcode, category, plaid, pending, import_date, notes) 
-                   VALUES (:transaction_id, :account_id, :amount, :description, :date, :auth_date, :merchant_name, :address, :zipcode, :category, :plaid, :pending, :import_date, :notes)
+            """INSERT INTO transactions (transaction_id, account_id, amount, description, date, auth_date, merchant_name, merchant_id, merchant_logo_url, address, zipcode, city, state, country, lat, lon, category, plaid, pending, import_date, notes) 
+                   VALUES (:transaction_id, :account_id, :amount, :description, :date, :auth_date, :merchant_name, :merchant_id, :merchant_logo_url, :address, :zipcode, :city, :state, :country, :lat, :lon, :category, :plaid, :pending, :import_date, :notes)
                    ON CONFLICT(transaction_id) DO UPDATE SET
                         account_id = excluded.account_id,
                         amount = excluded.amount,
@@ -49,8 +49,15 @@ def upsert_transactions(transactions) -> None:
                         date = excluded.date,
                         auth_date = excluded.auth_date,
                         merchant_name = excluded.merchant_name,
+                        merchant_id = excluded.merchant_id,
+                        merchant_logo_url = excluded.merchant_logo_id,
                         address = excluded.address,
                         zipcode = excluded.zipcode,
+                        city = excluded.city,
+                        state = excluded.state,
+                        country = excluded.country,
+                        lat = excluded.lat,
+                        lon = excluded.lon,
                         category = excluded.category,
                         plaid = excluded.plaid,
                         pending = excluded.pending,
@@ -65,8 +72,15 @@ def upsert_transactions(transactions) -> None:
                 "date": t.date,
                 "auth_date": t.auth_date,
                 "merchant_name": t.merchant_name,
+                "merchant_id": t.merchant_id,
+                "merchant_logo_url": t.merchant_logo_url,
                 "address": t.address,
                 "zipcode": t.zipcode,
+                "city": t.city,
+                "state": t.state,
+                "country": t.country,
+                "lat": t.lat,
+                "lon": t.lon,
                 "category": t.category,
                 "plaid": t.plaid_category,
                 "pending": t.pending,

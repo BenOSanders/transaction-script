@@ -11,9 +11,16 @@ class Transaction(BaseModel):
     description: str
     date: str | None = None
     auth_date: str | None = None
-    merchant_name: str | None = ""
+    merchant_name: str | None = None
+    merchant_id: str | None = None
+    merchant_logo_url: str | None = None
     address: str | None = None
     zipcode: str | None = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    lat: float | None = None
+    lon: float | None = None
     category: str | None = None
     plaid_category: str
     pending: bool
