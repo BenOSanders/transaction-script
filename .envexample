@@ -1,5 +1,11 @@
+# Plaid env
 ENVIRONMENT="SANDBOX"
 CLIENT_ID="123"
 PLAID_SECRET="123"
 DB_PATH="./bank.db"
 ACCESS_TOKEN=""
+
+# Grist env
+GRIST_VOLUME:"path/to/folder"
+GRIST_SESSION_SECRET=347283593y2p372h3iuhgp9ehsjkfd
+GRIST_DEFAULT_EMAIL=ben.sanders97@gmail.com

@@ -1,0 +1,11 @@
+# Docker compose for grist
+
+services:
+  grist:
+    image: gristlabs/grist
+    volumes:
+      - ${GRIST_VOLUME}:/persist
+    env_file:
+      - .env
+    port: 8484:8484
+    restart: always
