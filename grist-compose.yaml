@@ -7,5 +7,6 @@ services:
       - ${GRIST_VOLUME}:/persist
     env_file:
       - .env
-    port: 8484:8484
+    ports:
+      - 8484:8484
     restart: always
